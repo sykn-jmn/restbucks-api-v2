@@ -2,6 +2,7 @@ package com.orangeandbronze.restbucks.orders;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
@@ -9,7 +10,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "DRINK_ORDER")
 public class Order {
-    private @Id @GeneratedValue Long id;
+    private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     private Status status;
     private String productId;
     private String quantity;
