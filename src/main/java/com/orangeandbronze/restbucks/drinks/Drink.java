@@ -13,7 +13,6 @@ public class Drink {
     private String description;
     private String price;
     private String image;
-    private boolean favoriteFlag = false;
 
     public Drink() { }
     public Drink(String title, String description, String price, String image) {
@@ -61,13 +60,6 @@ public class Drink {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public boolean getFavoriteFlag(){
-        return favoriteFlag;
-    }
-    public void toggleFavoriteFlag(){
-        favoriteFlag = !favoriteFlag;
     }
 
     @Override
