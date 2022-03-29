@@ -14,14 +14,14 @@ class OrderModelAssembler implements RepresentationModelAssembler<Order, EntityM
         // Unconditional links to single-item resource and aggregate root
 
         EntityModel<Order> orderModel = EntityModel.of(order,
-                linkTo(methodOn(OrderController.class).one(order.getId())).withSelfRel(),
-                linkTo(methodOn(OrderController.class).all()).withRel("orders"));
+                linkTo(methodOn(OrderController.class).one(order.getId())).withSelfRel().withType("GET"),
+                linkTo(methodOn(OrderController.class).all()).withRel("orders").withType("GET"));
 
         // Conditional links based on state of the order
 
         if (order.getStatus() == Status.PENDING) {
-            orderModel.add(linkTo(methodOn(OrderController.class).cancel(order.getId())).withRel("cancel"));
-            orderModel.add(linkTo(methodOn(OrderController.class).complete(order.getId())).withRel("complete"));
+            orderModel.add(linkTo(methodOn(OrderController.class).cancel(order.getId())).withRel("cancel").withType("DELETE"));
+            orderModel.add(linkTo(methodOn(OrderController.class).complete(order.getId())).withRel("complete").withType("DELETE"));
         }
 
         return orderModel;

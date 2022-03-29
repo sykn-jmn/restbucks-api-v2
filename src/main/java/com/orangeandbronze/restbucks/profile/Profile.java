@@ -1,30 +1,59 @@
 package com.orangeandbronze.restbucks.profile;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.orangeandbronze.restbucks.favorite.Favorite;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 public class Profile {
     private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    private final String firstName;
-    private final String lastName;
+    private String userName;
+    private String password;
 
-    public Profile(String firstName, String lastName){
-        this.firstName = firstName;
-        this.lastName = lastName;
+    @JsonIgnore
+    @OneToMany(mappedBy = "profile")
+    private List<Favorite> favorites;
+
+    public Profile () {}
+
+    public Profile(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+        this.favorites = new ArrayList<>();
     }
 
-    public String getFirstName() {
-        return firstName;
+    public Profile(String userName, String password, List<Favorite> favorites) {
+        this.userName = userName;
+        this.password = password;
+        this.favorites = favorites;
     }
-    public String getLastName() {
-        return lastName;
-    }
+
     public Long getId() {
         return id;
+    }
+
+    public List<Favorite> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(List<Favorite> favorites) {
+        this.favorites = favorites;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
@@ -32,20 +61,11 @@ public class Profile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Profile profile = (Profile) o;
-        return id.equals(profile.id) && firstName.equals(profile.firstName) && lastName.equals(profile.lastName);
+        return Objects.equals(id, profile.id) && Objects.equals(userName, profile.userName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName);
-    }
-
-    @Override
-    public String toString() {
-        return "Profile{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
+        return Objects.hash(id, userName);
     }
 }

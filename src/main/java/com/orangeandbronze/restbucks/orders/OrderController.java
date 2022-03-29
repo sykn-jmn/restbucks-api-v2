@@ -23,7 +23,7 @@ public class OrderController {
         this.assembler = assember;
     }
     @GetMapping("/orders")
-    CollectionModel<EntityModel<Order>> all(){
+    public CollectionModel<EntityModel<Order>> all(){
         List<EntityModel<Order>> orders = orderRepository
                 .findAll()
                 .stream()

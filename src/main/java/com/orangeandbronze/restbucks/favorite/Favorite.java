@@ -1,23 +1,29 @@
 package com.orangeandbronze.restbucks.favorite;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orangeandbronze.restbucks.drinks.Drink;
+import com.orangeandbronze.restbucks.profile.Profile;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 public class Favorite {
     private @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+
     private String drink;
     private Long drinkId;
 
     Favorite () {}
 
-    public Favorite(Drink drink) {
+    public Favorite(Profile profile, Drink drink) {
+        this.profile = profile;
         this.drink = drink.getTitle();
         this.drinkId = drink.getId();
     }
@@ -25,6 +31,11 @@ public class Favorite {
     public Long getId() {
         return id;
     }
+
+    public Profile getProfile(){
+        return profile;
+    }
+
     public String getDrink() {
         return drink;
     }
