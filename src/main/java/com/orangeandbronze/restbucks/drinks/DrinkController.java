@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-class DrinkController {
+public class DrinkController {
     private final DrinkRepository drinkRepository;
     private final DrinkModelAssembler assembler;
-    DrinkController(DrinkRepository drinkRepository, DrinkModelAssembler assembler){
+    public DrinkController(DrinkRepository drinkRepository, DrinkModelAssembler assembler){
         this.drinkRepository = drinkRepository;
         this.assembler = assembler;
     }
 
     @GetMapping("/drinks")
-    CollectionModel<EntityModel<Drink>> all(){
+    public CollectionModel<EntityModel<Drink>> all(){
         List<EntityModel<Drink>> drinks = drinkRepository.
                 findAll()
                 .stream()
@@ -31,7 +31,7 @@ class DrinkController {
                 linkTo(methodOn(DrinkController.class).all()).withSelfRel());
     }
     @PostMapping("/drinks")
-    ResponseEntity<?> newDrink(@RequestBody Drink newDrink){
+    public ResponseEntity<?> newDrink(@RequestBody Drink newDrink){
         EntityModel<Drink> entityModel = assembler.toModel(drinkRepository.save(newDrink));
 
         return ResponseEntity
@@ -39,14 +39,14 @@ class DrinkController {
                 .body(entityModel);
     }
     @GetMapping("/drinks/{id}")
-    EntityModel<Drink> one(@PathVariable Long id){
+    public EntityModel<Drink> one(@PathVariable Long id){
         Drink drink =  drinkRepository.findById(id).orElseThrow(() -> new DrinkNotFoundException(id));
 
         return assembler.toModel(drink);
 
     }
     @PutMapping("/drinks/{id}")
-    ResponseEntity<?> replaceDrink(@RequestBody Drink newDrink, @PathVariable Long id){
+    public ResponseEntity<?> replaceDrink(@RequestBody Drink newDrink, @PathVariable Long id){
         Drink updatedDrink = drinkRepository.findById(id).map(drink -> {
             drink.setTitle(newDrink.getTitle());
             drink.setDescription(newDrink.getDescription());
@@ -64,7 +64,7 @@ class DrinkController {
                 .body(entityModel);
     }
     @DeleteMapping("/drinks/{id}")
-    ResponseEntity<?> deleteDrink(@PathVariable Long id){
+    public ResponseEntity<?> deleteDrink(@PathVariable Long id){
         drinkRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }

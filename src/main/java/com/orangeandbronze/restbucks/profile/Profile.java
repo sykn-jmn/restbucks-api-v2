@@ -39,4 +39,13 @@ public class Profile {
     public int hashCode() {
         return Objects.hash(id, firstName, lastName);
     }
+
+    @Override
+    public String toString() {
+        return "Profile{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }
