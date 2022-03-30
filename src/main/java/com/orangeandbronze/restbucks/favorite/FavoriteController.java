@@ -1,8 +1,11 @@
 package com.orangeandbronze.restbucks.favorite;
 
+import com.orangeandbronze.restbucks.drinks.Drink;
 import com.orangeandbronze.restbucks.profile.ProfileRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -61,11 +64,44 @@ public class FavoriteController {
         return null;
     }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> delete(@PathVariable Long id){
-//        favoriteRepository.deleteById(id);
-//        return ResponseEntity.noContent().build();
+//    @PostMapping
+//    public ResponseEntity<?> post(@PathVariable long profileId, @RequestBody Drink drink){
+//        List<Favorite> favorites = new ArrayList<>();
+//        System.out.println(drink);
+//        Favorite favorite = null;
+//        profileRepository.findById(profileId)
+//                .map(profile -> profile
+//                        .getFavorites()
+//                        .stream()
+//                        .filter(fave -> fave.getDrinkId()
+//                                .equals(drink.getId())).findAny().map(favorites::add));
+//        if (favorites.isEmpty()) {
+//            favorite = new Favorite(profileRepository.getById(profileId), drink);
+//            favoriteRepository.save(favorite);
+//        }
+//
 //    }
+    @PostMapping
+    public ResponseEntity<?> post(@RequestBody Drink drink, @PathVariable long profileId){
+
+        Favorite favorite = new Favorite(profileRepository.getById(profileId), drink);
+        if(favoriteRepository.findByDrinkId(drink.getId()).isEmpty()){
+            favoriteRepository.save(favorite);
+            EntityModel<Favorite> entityModel = assembler.toModel(favorite);
+            return ResponseEntity
+                    .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                    .body(entityModel);
+        }
+
+        return ResponseEntity.internalServerError().build();
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        favoriteRepository.deleteByDrinkId(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }
@@ -81,25 +117,7 @@ public class FavoriteController {
 ////                .created(linkTo(methodOn(FavoriteController.class).one(newFavorite.getId())).toUri())
 ////                .body(assembler.toModel(newFavorite));
 //    }
-/*
 
 
-    /*@PutMapping("/drinks/{id}")
-    public ResponseEntity<?> replaceDrink(@RequestBody Drink newDrink, @PathVariable Long id){
-        Drink updatedDrink = drinkRepository.findById(id).map(drink -> {
-            drink.setTitle(newDrink.getTitle());
-            drink.setDescription(newDrink.getDescription());
-            drink.setPrice(newDrink.getPrice());
-            drink.setImage(newDrink.getImage());
-            return drinkRepository.save(drink);
-        }).orElseGet(() -> {
-            newDrink.setId(id);
-            return drinkRepository.save(newDrink);
-        });
-        EntityModel<Drink> entityModel = assembler.toModel(updatedDrink);
 
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
-    }*/
 

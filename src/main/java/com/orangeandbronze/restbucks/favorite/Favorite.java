@@ -1,6 +1,7 @@
 package com.orangeandbronze.restbucks.favorite;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.orangeandbronze.restbucks.drinks.Drink;
 import com.orangeandbronze.restbucks.profile.Profile;
 
@@ -26,6 +27,10 @@ public class Favorite {
         this.profile = profile;
         this.drink = drink.getTitle();
         this.drinkId = drink.getId();
+    }
+
+    public void setId(Long id){
+        this.id = id;
     }
 
     public Long getId() {
