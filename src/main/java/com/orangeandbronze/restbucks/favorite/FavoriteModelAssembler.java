@@ -18,9 +18,9 @@ class FavoriteModelAssembler implements RepresentationModelAssembler<Favorite, E
 
         EntityModel<Favorite> fave =  EntityModel.of(favorite,
                 linkTo(methodOn(FavoriteController.class).one(profileId, favorite.getId())).withSelfRel().withType("GET"),
-                linkTo(methodOn(FavoriteController.class).all(profileId)).withRel("restbucks:favorites").withType("GET"),
+                linkTo(methodOn(FavoriteController.class).all(null)).withRel("restbucks:favorites").withType("GET"),
                 linkTo(methodOn(DrinkController.class).one(favorite.getDrinkId())).withRel("restbucks:drink_id").withType("GET"),
-                linkTo(methodOn(ProfileController.class).one(profileId)).withRel("profile").withType("GET"));
+                linkTo(methodOn(ProfileController.class).one(null)).withRel("profile").withType("GET"));
 
         return fave;
     }

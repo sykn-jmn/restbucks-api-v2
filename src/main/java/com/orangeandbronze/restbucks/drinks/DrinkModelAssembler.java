@@ -14,7 +14,7 @@ class DrinkModelAssembler implements RepresentationModelAssembler<Drink, EntityM
     public EntityModel<Drink> toModel(Drink drink){
         EntityModel<Drink> drinkModel = EntityModel.of(drink,
                 linkTo(methodOn(DrinkController.class).one(drink.getId())).withSelfRel().withType("GET"),
-                linkTo(methodOn(DrinkController.class).all()).withRel("drinks").withType("GET"));
+                linkTo(methodOn(DrinkController.class).all(null)).withRel("restbucks:drinks").withType("GET"));
 
 //        if(!drink.getFavoriteFlag()){
 //            drinkModel.add(linkTo(methodOn(FavoriteController.class).post(drink)).withRel("restbucks:add_favorite").withType("PUT"));

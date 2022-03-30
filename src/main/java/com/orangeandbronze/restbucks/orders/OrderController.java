@@ -1,5 +1,6 @@
 package com.orangeandbronze.restbucks.orders;
 
+import com.orangeandbronze.restbucks.drinks.Drink;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,13 +43,13 @@ public class OrderController {
     }
 
     @PostMapping("/orders")
-    ResponseEntity<EntityModel<Order>> newOrder(@RequestBody Order order){
-        order.setStatus(Status.PENDING);
-        Order newOrder = orderRepository.save(order);
+    public ResponseEntity<EntityModel<Order>> newOrder(@RequestBody Drink drink){
+        Order order = new Order(Status.PENDING,drink,1,drink.getPrice(), LocalDateTime.now());
+        order = orderRepository.save(order);
 
         return ResponseEntity
-                .created(linkTo(methodOn(OrderController.class).one(newOrder.getId())).toUri())
-                .body(assembler.toModel(newOrder));
+                .created(linkTo(methodOn(OrderController.class).one(order.getId())).toUri())
+                .body(assembler.toModel(order));
     }
 
     @DeleteMapping("/orders/{id}/cancel")

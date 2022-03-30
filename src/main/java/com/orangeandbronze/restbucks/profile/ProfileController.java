@@ -1,7 +1,9 @@
 package com.orangeandbronze.restbucks.profile;
 
+import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,33 +14,26 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "/profiles")
+@AllArgsConstructor
 public class ProfileController {
 
     private final ProfileRepository profileRepository;
     private final ProfileModelAssembler assembler;
-    public ProfileController(ProfileRepository profileRepository, ProfileModelAssembler assembler){
-        this.profileRepository = profileRepository;
-        this.assembler = assembler;
-    }
 
-    @GetMapping
-    public CollectionModel<EntityModel<Profile>> all(){
-        List<EntityModel<Profile>> profiles = profileRepository.
-                findAll()
-                .stream()
-                .map(assembler::toModel)
-                .collect(Collectors.toList());
-        return CollectionModel.of(profiles,
-                linkTo(methodOn(ProfileController.class).all()).withSelfRel());
-    }
+//    @GetMapping
+//    public CollectionModel<EntityModel<Profile>> all(){
+//        List<EntityModel<Profile>> profiles = profileRepository.
+//                findAll()
+//                .stream()
+//                .map(assembler::toModel)
+//                .collect(Collectors.toList());
+//        return CollectionModel.of(profiles,
+//                linkTo(methodOn(ProfileController.class).all()).withSelfRel());
+//    }
 
-    @GetMapping("/{id}")
-    public EntityModel<Profile> one(@PathVariable Long id){
-        Profile profile = profileRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException());
-
+    @GetMapping("")
+    public EntityModel<Profile> one(@AuthenticationPrincipal Profile profile){
         return assembler.toModel(profile);
-
     }
 
 }

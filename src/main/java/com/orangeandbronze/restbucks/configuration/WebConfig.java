@@ -12,6 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**");
+        registry.addMapping("/**").allowedOrigins("http://localhost:3000","http://k8s-default-coffeesh-1e8cca9131-519618060.us-east-2.elb.amazonaws.com/").allowCredentials(true);
     }
 }

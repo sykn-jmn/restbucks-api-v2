@@ -1,6 +1,9 @@
 package com.orangeandbronze.restbucks.drinks;
 
+import com.orangeandbronze.restbucks.RestbucksController;
 import com.orangeandbronze.restbucks.orders.OrderController;
+import com.orangeandbronze.restbucks.profile.Profile;
+import com.orangeandbronze.restbucks.profile.ProfileController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -8,6 +11,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,14 +30,23 @@ public class DrinkController {
 
 
     @GetMapping("/drinks")
-    public CollectionModel<EntityModel<Drink>> all(){
+    public CollectionModel<EntityModel<Drink>> all(@AuthenticationPrincipal Profile profile){
         List<EntityModel<Drink>> drinks = drinkRepository.
                 findAll()
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
-        return CollectionModel.of(drinks,
-                linkTo(methodOn(DrinkController.class).all()).withSelfRel());
+        if(profile != null){
+            drinks.forEach(drinkEntityModel -> drinkEntityModel.add(linkTo(methodOn(OrderController.class).newOrder(null)).withRel("restbucks:newOrder")));
+        }
+        CollectionModel<EntityModel<Drink>> collectionModel =  CollectionModel.of(drinks,
+                linkTo(methodOn(DrinkController.class).all(null)).withSelfRel());
+        if(profile == null){
+            collectionModel.add(linkTo(methodOn(RestbucksController.class).login()).withRel("restbucks:login"));
+        }else{
+            collectionModel.add(linkTo(methodOn(ProfileController.class).one(profile)).withRel("restbucks:profile"));
+        }
+        return collectionModel;
     }
     @PostMapping("/drinks")
     public ResponseEntity<?> newDrink(@RequestBody Drink newDrink){

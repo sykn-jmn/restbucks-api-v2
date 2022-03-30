@@ -1,11 +1,13 @@
 package com.orangeandbronze.restbucks.favorite;
 
 import com.orangeandbronze.restbucks.drinks.Drink;
+import com.orangeandbronze.restbucks.profile.Profile;
 import com.orangeandbronze.restbucks.profile.ProfileRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -64,7 +66,7 @@ public class FavoriteController {
         return null;
     }
 
-//    @PostMapping
+    //    @PostMapping
 //    public ResponseEntity<?> post(@PathVariable long profileId, @RequestBody Drink drink){
 //        List<Favorite> favorites = new ArrayList<>();
 //        System.out.println(drink);
@@ -117,7 +119,5 @@ public class FavoriteController {
 ////                .created(linkTo(methodOn(FavoriteController.class).one(newFavorite.getId())).toUri())
 ////                .body(assembler.toModel(newFavorite));
 //    }
-
-
 
 

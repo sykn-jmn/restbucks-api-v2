@@ -2,70 +2,66 @@ package com.orangeandbronze.restbucks.profile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.orangeandbronze.restbucks.favorite.Favorite;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
-public class Profile {
+@Getter
+@Setter
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+public class Profile implements UserDetails {
     private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    private String userName;
+    private String username;
     private String password;
 
     @JsonIgnore
     @OneToMany(mappedBy = "profile")
     private List<Favorite> favorites;
 
-    public Profile () {}
-
     public Profile(String userName, String password) {
-        this.userName = userName;
+        this.username = userName;
         this.password = password;
         this.favorites = new ArrayList<>();
     }
 
     public Profile(String userName, String password, List<Favorite> favorites) {
-        this.userName = userName;
+        this.username = userName;
         this.password = password;
         this.favorites = favorites;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public List<Favorite> getFavorites() {
-        return favorites;
-    }
-
-    public void setFavorites(List<Favorite> favorites) {
-        this.favorites = favorites;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Profile profile = (Profile) o;
-        return Objects.equals(id, profile.id) && Objects.equals(userName, profile.userName);
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, userName);
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
