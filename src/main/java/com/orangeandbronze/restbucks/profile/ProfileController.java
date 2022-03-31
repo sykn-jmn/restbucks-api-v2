@@ -1,5 +1,6 @@
 package com.orangeandbronze.restbucks.profile;
 
+import com.orangeandbronze.restbucks.favorite.FavoriteController;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -33,7 +34,12 @@ public class ProfileController {
 
     @GetMapping("")
     public EntityModel<Profile> one(@AuthenticationPrincipal Profile profile){
-        return assembler.toModel(profile);
+        EntityModel<Profile> model = assembler.toModel(profile);
+
+        if(!profileRepository.findById(profile.getId()).get().getFavorites().isEmpty()){
+            model.add(linkTo(methodOn(FavoriteController.class).all(profile)).withRel("restbucks:favorites").withType("GET"));
+        }
+        return model;
     }
 
 }
