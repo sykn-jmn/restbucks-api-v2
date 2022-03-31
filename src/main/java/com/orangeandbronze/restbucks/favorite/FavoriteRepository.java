@@ -9,6 +9,7 @@ import java.util.List;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     public List<Favorite> findByDrinkId(Long id);
+    public List<Favorite> findByProfile(Profile profile);
     public List<Favorite> findByProfileAndDrink(Profile profile, Drink drink);
     public void deleteByDrinkAndProfile(Drink drink,Profile profile);
 }

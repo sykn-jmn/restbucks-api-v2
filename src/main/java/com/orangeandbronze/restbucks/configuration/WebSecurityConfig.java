@@ -20,6 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().mvcMatchers("/favorites").hasRole("USER")
                 .mvcMatchers("/login").hasRole("USER")
+                .mvcMatchers("/profile").hasRole("USER")
                 .and()
                 .authorizeRequests().anyRequest().permitAll()
                 .and().httpBasic().authenticationEntryPoint(new NoPopUpBasicAuthenticationEntryPoint())

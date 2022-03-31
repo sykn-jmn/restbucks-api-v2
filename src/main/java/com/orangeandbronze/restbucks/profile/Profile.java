@@ -22,6 +22,7 @@ import java.util.List;
 public class Profile implements UserDetails {
     private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
     private String username;
+    @JsonIgnore
     private String password;
 
     @JsonIgnore

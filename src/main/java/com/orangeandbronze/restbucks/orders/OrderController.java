@@ -1,12 +1,14 @@
 package com.orangeandbronze.restbucks.orders;
 
 import com.orangeandbronze.restbucks.drinks.Drink;
+import com.orangeandbronze.restbucks.profile.Profile;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
+@RequestMapping("/orders")
 public class OrderController {
     private final OrderRepository orderRepository;
     private final OrderModelAssembler assembler;
@@ -24,7 +27,7 @@ public class OrderController {
         this.orderRepository = orderRepository;
         this.assembler = assember;
     }
-    @GetMapping("/orders")
+    @GetMapping("")
     public CollectionModel<EntityModel<Order>> all(){
         List<EntityModel<Order>> orders = orderRepository
                 .findAll()
@@ -34,7 +37,8 @@ public class OrderController {
         return CollectionModel.of(orders,
                 linkTo(methodOn(OrderController.class).all()).withSelfRel());
     }
-    @GetMapping("/orders/{id}")
+
+    @GetMapping("/{id}")
     EntityModel<Order> one(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException(id));
@@ -42,50 +46,13 @@ public class OrderController {
         return assembler.toModel(order);
     }
 
-    @PostMapping("/orders")
-    public ResponseEntity<EntityModel<Order>> newOrder(@RequestBody Drink drink){
-        Order order = new Order(Status.PENDING,drink,1,drink.getPrice(), LocalDateTime.now());
+    @PostMapping("")
+    public ResponseEntity<EntityModel<Order>> newOrder(@RequestBody Drink drink, @AuthenticationPrincipal Profile profile){
+        Order order = new Order(Status.PENDING,drink,1,drink.getPrice(), LocalDateTime.now(), profile);
         order = orderRepository.save(order);
 
         return ResponseEntity
                 .created(linkTo(methodOn(OrderController.class).one(order.getId())).toUri())
                 .body(assembler.toModel(order));
-    }
-
-    @DeleteMapping("/orders/{id}/cancel")
-    ResponseEntity<?> cancel(@PathVariable Long id){
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
-
-        if(order.getStatus().equals(Status.PENDING)){
-            order.setStatus(Status.CANCELLED);
-            return ResponseEntity.ok(assembler.toModel(orderRepository.save(order)));
-        }
-        return ResponseEntity
-                .status(HttpStatus.METHOD_NOT_ALLOWED)
-                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
-                .body("You can't cancel an order that is in the " + order.getStatus() + " status");
-//                 .body(Problem.create()
-//                        .withTitle("Method not allowed")
-//                        .withDetail("You can't canel an order that is in the " + order.getStatus() + " status");
-
-    }
-    @DeleteMapping("/orders/{id}/delete")
-    ResponseEntity<?> complete(@PathVariable Long id){
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
-
-        if(order.getStatus().equals(Status.PENDING)){
-            order.setStatus(Status.CANCELLED);
-            return ResponseEntity.ok(assembler.toModel(orderRepository.save(order)));
-        }
-        return ResponseEntity
-                .status(HttpStatus.METHOD_NOT_ALLOWED)
-                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
-                .body("You can't complete an order that is in the " + order.getStatus() + " status");
-//                .body(Problem.create()
-//                        .withTitle("Method not allowed")
-//                        .withDetail("You can't canel an order that is in the " + order.getStatus() + " status");
-
     }
 }

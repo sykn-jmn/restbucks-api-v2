@@ -21,68 +21,12 @@ public class ProfileController {
     private final ProfileRepository profileRepository;
     private final ProfileModelAssembler assembler;
 
-//    @GetMapping
-//    public CollectionModel<EntityModel<Profile>> all(){
-//        List<EntityModel<Profile>> profiles = profileRepository.
-//                findAll()
-//                .stream()
-//                .map(assembler::toModel)
-//                .collect(Collectors.toList());
-//        return CollectionModel.of(profiles,
-//                linkTo(methodOn(ProfileController.class).all()).withSelfRel());
-//    }
-
     @GetMapping("")
     public EntityModel<Profile> one(@AuthenticationPrincipal Profile profile){
         EntityModel<Profile> model = assembler.toModel(profile);
-
         if(!profileRepository.findById(profile.getId()).get().getFavorites().isEmpty()){
             model.add(linkTo(methodOn(FavoriteController.class).all(profile)).withRel("restbucks:favorites").withType("GET"));
         }
         return model;
     }
-
 }
-
-/*
-
-    @PostMapping("/drinks")
-    public ResponseEntity<?> newDrink(@RequestBody Drink newDrink){
-        EntityModel<Drink> entityModel = assembler.toModel(drinkRepository.save(newDrink));
-
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
-    }
-    @GetMapping("/drinks/{id}")
-    public EntityModel<Drink> one(@PathVariable Long id){
-        Drink drink =  drinkRepository.findById(id).orElseThrow(() -> new DrinkNotFoundException(id));
-
-        return assembler.toModel(drink);
-
-    }
-    @PutMapping("/drinks/{id}")
-    public ResponseEntity<?> replaceDrink(@RequestBody Drink newDrink, @PathVariable Long id){
-        Drink updatedDrink = drinkRepository.findById(id).map(drink -> {
-            drink.setTitle(newDrink.getTitle());
-            drink.setDescription(newDrink.getDescription());
-            drink.setPrice(newDrink.getPrice());
-            drink.setImage(newDrink.getImage());
-            return drinkRepository.save(drink);
-        }).orElseGet(() -> {
-            newDrink.setId(id);
-            return drinkRepository.save(newDrink);
-        });
-        EntityModel<Drink> entityModel = assembler.toModel(updatedDrink);
-
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
-    }
-    @DeleteMapping("/drinks/{id}")
-    public ResponseEntity<?> deleteDrink(@PathVariable Long id){
-        drinkRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
-
- */

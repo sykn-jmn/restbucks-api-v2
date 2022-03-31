@@ -39,15 +39,14 @@ class LoadDatabase {
             drinkRepository.save(new Drink("Matcha Green Tea Latte", "Pure matcha tea, steamed milk and demerara syrup", new BigDecimal("250.00"), "https://d1ralsognjng37.cloudfront.net/ab529c7d-1481-4e6b-b9bb-990db4aa59d3.jpeg"));
             drink5 = drinkRepository.save(drink5);
 
-            orderRepository.save(new Order(Status.PENDING,drink1, 1, new BigDecimal("1"), LocalDateTime.now()));
-            orderRepository.save(new Order(Status.COMPLETED,drink2, 1, new BigDecimal("1"), LocalDateTime.now()));
-
             Profile eurese = new Profile("eurese", passwordEncoder.encode("strongpassword123"));
             Profile jeman = new Profile("jeman", passwordEncoder.encode("gwapito"));
             eurese = profileRepository.save(eurese);
             jeman = profileRepository.save(jeman);
             profileRepository.save(new Profile("viver", passwordEncoder.encode("conyorichkid123")));
 
+            orderRepository.save(new Order(Status.PENDING,drink1, 1, new BigDecimal("1"), LocalDateTime.now(),eurese));
+            orderRepository.save(new Order(Status.COMPLETED,drink2, 1, new BigDecimal("1"), LocalDateTime.now(),eurese));
             // eurese favorites
             favoriteRepository.save(new Favorite(eurese, drink1));
             favoriteRepository.save(new Favorite(eurese, drink5));
