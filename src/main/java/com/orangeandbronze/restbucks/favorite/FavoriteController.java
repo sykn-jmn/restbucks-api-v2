@@ -1,8 +1,10 @@
 package com.orangeandbronze.restbucks.favorite;
 
 import com.orangeandbronze.restbucks.drinks.Drink;
+import com.orangeandbronze.restbucks.drinks.DrinkRepository;
 import com.orangeandbronze.restbucks.profile.Profile;
 import com.orangeandbronze.restbucks.profile.ProfileRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/profiles/favorites")
 public class FavoriteController {
@@ -24,12 +28,7 @@ public class FavoriteController {
     private final ProfileRepository profileRepository;
     private final FavoriteRepository favoriteRepository;
     private final FavoriteModelAssembler assembler;
-
-    public FavoriteController(ProfileRepository profileRepository, FavoriteRepository favoriteRepository, FavoriteModelAssembler assembler) {
-        this.profileRepository = profileRepository;
-        this.favoriteRepository = favoriteRepository;
-        this.assembler = assembler;
-    }
+    private final DrinkRepository drinkRepository;
 
     @GetMapping
     public CollectionModel<EntityModel<Favorite>> all(@AuthenticationPrincipal Profile profile) {
@@ -83,10 +82,10 @@ public class FavoriteController {
 //        }
 //
 //    }
-    @PostMapping
-    public ResponseEntity<?> post(@RequestBody Drink drink, @AuthenticationPrincipal Profile profile){
-        Favorite favorite = new Favorite(profile, drink);
-        if(favoriteRepository.findByDrinkId(drink.getId()).isEmpty()){
+    @PostMapping("/{id}")
+    public ResponseEntity<?> post(@PathVariable long id, @AuthenticationPrincipal Profile profile){
+        Favorite favorite = new Favorite(profile, drinkRepository.getById(id));
+        if(favoriteRepository.findByDrinkId(id).isEmpty()){
             favoriteRepository.save(favorite);
             EntityModel<Favorite> entityModel = assembler.toModel(favorite);
             return ResponseEntity
@@ -98,9 +97,14 @@ public class FavoriteController {
     }
 
 
+    @Transactional
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
-        favoriteRepository.deleteByDrinkId(id);
+    public ResponseEntity<?> delete(@PathVariable Long id, @AuthenticationPrincipal Profile profile){
+        if(profile != null){
+            Drink drink = drinkRepository.findById(id).get();
+            favoriteRepository.deleteByDrinkAndProfile(drink, profile);
+            return ResponseEntity.ok().build();
+        }
         return ResponseEntity.noContent().build();
     }
 

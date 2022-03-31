@@ -23,7 +23,6 @@ public class Drink {
     private String description;
     private BigDecimal price;
     private String image;
-
     public Drink(String title, String description, BigDecimal price, String image) {
         this.title = title;
         this.description = description;

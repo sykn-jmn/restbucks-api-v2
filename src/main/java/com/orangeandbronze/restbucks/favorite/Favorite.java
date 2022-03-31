@@ -25,12 +25,12 @@ public class Favorite {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
-    private String drink;
-    private Long drinkId;
+    @ManyToOne
+    @JsonIgnore
+    private Drink drink;
 
     public Favorite(Profile profile, Drink drink) {
         this.profile = profile;
-        this.drink = drink.getTitle();
-        this.drinkId = drink.getId();
+        this.drink = drink;
     }
 }

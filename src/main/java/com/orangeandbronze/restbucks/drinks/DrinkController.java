@@ -1,10 +1,13 @@
 package com.orangeandbronze.restbucks.drinks;
 
 import com.orangeandbronze.restbucks.RestbucksController;
+import com.orangeandbronze.restbucks.favorite.Favorite;
 import com.orangeandbronze.restbucks.favorite.FavoriteController;
+import com.orangeandbronze.restbucks.favorite.FavoriteRepository;
 import com.orangeandbronze.restbucks.orders.OrderController;
 import com.orangeandbronze.restbucks.profile.Profile;
 import com.orangeandbronze.restbucks.profile.ProfileController;
+import com.orangeandbronze.restbucks.profile.ProfileRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -23,9 +26,13 @@ public class DrinkController {
 
     private final DrinkRepository drinkRepository;
     private final DrinkModelAssembler assembler;
+    private final ProfileRepository profileRepository;
+    private final FavoriteRepository favoriteRepository;
 
-    public DrinkController(DrinkRepository drinkRepository, DrinkModelAssembler assembler){
+    public DrinkController(DrinkRepository drinkRepository, DrinkModelAssembler assembler, ProfileRepository profileRepository, FavoriteRepository favoriteRepository){
         this.drinkRepository = drinkRepository;
+        this.profileRepository = profileRepository;
+        this.favoriteRepository = favoriteRepository;
         this.assembler = assembler;
     }
 
@@ -37,10 +44,20 @@ public class DrinkController {
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
+
+
         if(profile != null){
+//            List<EntityModel<Favorite>> favorites = getFavoritesForPerson
+
             drinks.forEach(drinkEntityModel -> {
                 drinkEntityModel.add(linkTo(methodOn(OrderController.class).newOrder(null)).withRel("restbucks:newOrder"));
-                drinkEntityModel.add(linkTo(methodOn(FavoriteController.class).post(drinkEntityModel.getContent(),null)).withRel("restbucks:addToFavorites"));
+                if(favoriteRepository.findByProfileAndDrink(profile, drinkEntityModel.getContent()).isEmpty()){
+                    drinkEntityModel.add(linkTo(methodOn(FavoriteController.class).post(drinkEntityModel.getContent().getId(),profile)).withRel("restbucks:addToFavorites"));
+                }else {
+                    drinkEntityModel.add(linkTo(methodOn(FavoriteController.class).delete(drinkEntityModel.getContent().getId(), profile)).withRel("restbucks:removeFavorites"));
+                }
+
             });
         }
         CollectionModel<EntityModel<Drink>> collectionModel =  CollectionModel.of(drinks,
@@ -52,6 +69,18 @@ public class DrinkController {
         }
         return collectionModel;
     }
+
+
+//    private List<EntityModel<Favorite>> getFavoritesForPerson(long profileId) {
+//        List<EntityModel<Favorite>> favorites = profileRepository.findById(profileId)
+//                .map(profile -> profile.getFavorites()
+//                        .stream()
+//                        .map(assembler::toModel)
+//                        .collect(Collectors.toList()))
+//                .orElseThrow(RuntimeException::new);
+//        return favorites;
+//    }
+
     @PostMapping("/drinks")
     public ResponseEntity<?> newDrink(@RequestBody Drink newDrink){
         EntityModel<Drink> entityModel = assembler.toModel(drinkRepository.save(newDrink));
