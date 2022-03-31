@@ -55,7 +55,7 @@ public class FavoriteController {
                 .map(profile -> profile
                         .getFavorites()
                         .stream()
-                        .filter(fave -> fave.getId()
+                        .filter(fave -> fave.getDrink().getId()
                                 .equals(id)).findAny().map(favorites::add));
         if (!favorites.isEmpty()) {
             Favorite favorite = favorites.get(0);
