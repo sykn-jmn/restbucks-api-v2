@@ -1,6 +1,7 @@
 package com.orangeandbronze.restbucks.drinks;
 
 import com.orangeandbronze.restbucks.RestbucksController;
+import com.orangeandbronze.restbucks.favorite.FavoriteController;
 import com.orangeandbronze.restbucks.orders.OrderController;
 import com.orangeandbronze.restbucks.profile.Profile;
 import com.orangeandbronze.restbucks.profile.ProfileController;
@@ -37,7 +38,10 @@ public class DrinkController {
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
         if(profile != null){
-            drinks.forEach(drinkEntityModel -> drinkEntityModel.add(linkTo(methodOn(OrderController.class).newOrder(null)).withRel("restbucks:newOrder")));
+            drinks.forEach(drinkEntityModel -> {
+                drinkEntityModel.add(linkTo(methodOn(OrderController.class).newOrder(null)).withRel("restbucks:newOrder"));
+                drinkEntityModel.add(linkTo(methodOn(FavoriteController.class).post(drinkEntityModel.getContent(),null)).withRel("restbucks:addToFavorites"));
+            });
         }
         CollectionModel<EntityModel<Drink>> collectionModel =  CollectionModel.of(drinks,
                 linkTo(methodOn(DrinkController.class).all(null)).withSelfRel());

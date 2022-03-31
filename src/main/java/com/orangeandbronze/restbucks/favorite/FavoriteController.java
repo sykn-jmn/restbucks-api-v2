@@ -18,7 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/profiles/{profileId}/favorites")
+@RequestMapping("/profiles/favorites")
 public class FavoriteController {
 
     private final ProfileRepository profileRepository;
@@ -32,11 +32,11 @@ public class FavoriteController {
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<Favorite>> all(@PathVariable Long profileId) {
-        final List<EntityModel<Favorite>> collection = getFavoritesForPerson(profileId);
+    public CollectionModel<EntityModel<Favorite>> all(@AuthenticationPrincipal Profile profile) {
+        final List<EntityModel<Favorite>> collection = getFavoritesForPerson(profile.getId());
 
         return CollectionModel.of(collection,
-                linkTo(methodOn(FavoriteController.class).all(profileId)).withSelfRel());
+                linkTo(methodOn(FavoriteController.class).all(profile)).withSelfRel());
     }
 
     private List<EntityModel<Favorite>> getFavoritesForPerson(long profileId) {
@@ -84,9 +84,8 @@ public class FavoriteController {
 //
 //    }
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody Drink drink, @PathVariable long profileId){
-
-        Favorite favorite = new Favorite(profileRepository.getById(profileId), drink);
+    public ResponseEntity<?> post(@RequestBody Drink drink, @AuthenticationPrincipal Profile profile){
+        Favorite favorite = new Favorite(profile, drink);
         if(favoriteRepository.findByDrinkId(drink.getId()).isEmpty()){
             favoriteRepository.save(favorite);
             EntityModel<Favorite> entityModel = assembler.toModel(favorite);

@@ -15,7 +15,7 @@ class ProfileModelAssembler implements RepresentationModelAssembler<Profile, Ent
     public EntityModel<Profile> toModel(Profile profile){
         EntityModel<Profile> profileModel = EntityModel.of(profile,
                 linkTo(methodOn(ProfileController.class).one(profile)).withSelfRel().withType("GET"),
-                linkTo(methodOn(FavoriteController.class).all(profile.getId())).withRel("restbucks:favorites"));
+                linkTo(methodOn(FavoriteController.class).all(profile)).withRel("restbucks:favorites"));
 //                linkTo(methodOn(ProfileController.class).all()).withRel("restbucks:profiles").withType("GET"));
 //        if(!profile.getFavorites().isEmpty()){
 //            profileModel.add(linkTo(methodOn(FavoriteController.class).all(profile)).withRel("restbucks:favorites").withType("GET"));
