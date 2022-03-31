@@ -85,7 +85,7 @@ public class FavoriteController {
     @PostMapping("/{id}")
     public ResponseEntity<?> post(@PathVariable long id, @AuthenticationPrincipal Profile profile){
         Favorite favorite = new Favorite(profile, drinkRepository.getById(id));
-        if(favoriteRepository.findByDrinkId(id).isEmpty()){
+        if(favoriteRepository.findByProfileAndDrink(profile, drinkRepository.getById(id)).isEmpty()){
             favoriteRepository.save(favorite);
             EntityModel<Favorite> entityModel = assembler.toModel(favorite);
             return ResponseEntity
