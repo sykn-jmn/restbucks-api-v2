@@ -90,10 +90,22 @@ public class DrinkController {
                 .body(entityModel);
     }
     @GetMapping("/drinks/{id}")
-    public EntityModel<Drink> one(@PathVariable Long id){
+    public EntityModel<Drink> one(@PathVariable Long id, @AuthenticationPrincipal Profile profile){
         Drink drink =  drinkRepository.findById(id).orElseThrow(() -> new DrinkNotFoundException(id));
 
-        return assembler.toModel(drink);
+        EntityModel<Drink> model = assembler.toModel(drink);
+
+
+        if(profile != null){
+            model.add(linkTo(methodOn(OrderController.class).newOrder(null)).withRel("restbucks:newOrder"));
+
+            if(favoriteRepository.findByProfileAndDrink(profile, model.getContent()).isEmpty()){
+                model.add(linkTo(methodOn(FavoriteController.class).post(model.getContent().getId(),profile)).withRel("restbucks:addToFavorites"));
+            }else {
+                model.add(linkTo(methodOn(FavoriteController.class).delete(model.getContent().getId(), profile)).withRel("restbucks:removeFavorites"));
+            }
+        }
+        return model;
 
     }
     @PutMapping("/drinks/{id}")

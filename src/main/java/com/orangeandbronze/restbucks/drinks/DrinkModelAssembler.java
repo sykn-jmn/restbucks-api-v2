@@ -13,7 +13,7 @@ class DrinkModelAssembler implements RepresentationModelAssembler<Drink, EntityM
     @Override
     public EntityModel<Drink> toModel(Drink drink){
         EntityModel<Drink> drinkModel = EntityModel.of(drink,
-                linkTo(methodOn(DrinkController.class).one(drink.getId())).withSelfRel().withType("GET"),
+                linkTo(methodOn(DrinkController.class).one(drink.getId(), null)).withSelfRel().withType("GET"),
                 linkTo(methodOn(DrinkController.class).all(null)).withRel("restbucks:drinks").withType("GET"));
 
 //        if(!drink.getFavoriteFlag()){
