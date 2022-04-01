@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -46,9 +47,13 @@ public class FavoriteController {
         }
         favoriteRepository.save(favorite);
         EntityModel<Favorite> entityModel = assembler.toModel(favorite);
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
+        return ResponseEntity.created(linkTo(methodOn(FavoriteController.class).get(id,profile)).toUri()).body(entityModel);
+    }
+
+    @GetMapping("/id")
+    public ResponseEntity<Favorite> get(@PathVariable long id, @AuthenticationPrincipal Profile profile){
+        Favorite favorite = favoriteRepository.getById(id);
+        return new ResponseEntity<Favorite>(favorite, HttpStatus.OK);
     }
 
 
