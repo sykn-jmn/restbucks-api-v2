@@ -48,7 +48,7 @@ public class OrderController {
 
     @PostMapping("")
     public ResponseEntity<EntityModel<Order>> newOrder(@RequestBody Drink drink, @AuthenticationPrincipal Profile profile){
-        Order order = new Order(Status.PENDING,drink,1,drink.getPrice(), LocalDateTime.now(), profile);
+        Order order = new Order(Status.PENDING,drink,1,drink.getPrice(), LocalDateTime.now().plusHours(8), profile);
         order = orderRepository.save(order);
 
         return ResponseEntity
