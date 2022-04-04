@@ -52,9 +52,8 @@ public class DrinkController {
                 .body(entityModel);
     }
 
-    @GetMapping("/drinks/{id}")
-    public EntityModel<Drink> one(@PathVariable Long id, @AuthenticationPrincipal Profile profile){
-        Drink drink =  drinkRepository.findById(id).orElseThrow(() -> new DrinkNotFoundException(id));
+    @GetMapping("/drinks/{drink}")
+    public EntityModel<Drink> one(@PathVariable Drink drink, @AuthenticationPrincipal Profile profile){
         EntityModel<Drink> model = assembler.toModel(drink,profile);
         return model;
     }
